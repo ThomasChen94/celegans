@@ -37,6 +37,8 @@ def compute_pagerank(Graph):
     return sorted(listPageRank)[::-1]
 
 
+def detect_community_GN(Graph):
+
 
 
 
