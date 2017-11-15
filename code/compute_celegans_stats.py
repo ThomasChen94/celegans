@@ -1,4 +1,5 @@
 import snap
+import matplotlib.pyplot as plt
 
 def compute_HITS(Graph):
     '''
@@ -37,14 +38,33 @@ def compute_pagerank(Graph):
     return sorted(listPageRank)[::-1]
 
 
-def detect_community_GN(Graph):
+def get_clustering_coefficient(Graph):
+    return snap.GetClustCf (Graph, -1)
 
+def draw_degree_distribution(Graph, logAxis = True):
+    DegToCntV = snap.TIntPrV()
+    snap.GetDegCnt(Graph, DegToCntV)
+    num_node = Graph.GetNodes()
+    X, Y = [], []
+    for item in DegToCntV:
+        if item.GetVal1() == 0 or item.GetVal2() == 0:
+            continue
+        X.append(item.GetVal1())
+        Y.append(item.GetVal2() * 1.0 / num_node)
+
+    plt.loglog(X, Y, color = 'black', label = 'Degree Distribution (log)')
+    plt.xlabel('Degree(log)')
+    plt.ylabel('Number of nodes(log)')
+    plt.show()
 
 
 
 Graph = snap.LoadEdgeList(snap.PNGraph, "../data/celegans_n306.txt", 0, 1)
 
+draw_degree_distribution(Graph)
 
-print compute_HITS(Graph)
-print compute_pagerank(Graph)
+#print get_clustering_coefficient(Graph)
+
+# print compute_HITS(Graph)
+# print compute_pagerank(Graph)
 
