@@ -1,9 +1,10 @@
 import snap
 import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+import numpy as np
 
 def compute_HITS(Graph):
     '''
-
     :param Graph: the graph to compute HITS on
     :return:
         1. list of tuple (hub_score, node_id) in descending order
@@ -25,7 +26,6 @@ def compute_HITS(Graph):
 
 def compute_pagerank(Graph):
     '''
-
     :param Graph: the graph to compute pagerank on
     :return: a list of tuple (pagerank_score, node_id) in descending order
     '''
@@ -56,15 +56,35 @@ def draw_degree_distribution(Graph, logAxis = True):
     plt.xlabel('Degree(log)')
     plt.ylabel('Number of nodes(log)')
     plt.show()
+    return X, Y
 
 
+def fit_deg_dist(Graph):
+
+    def func(x, a, b):
+        return a * x * np.exp(-b * x)
+    X, Y = draw_degree_distribution(Graph)
+    X = np.array(X)
+    Y = np.array(Y)
+    popt, pcov = curve_fit(func, X, Y)
+    a, b = popt
+    plt.plot(X, Y, color = 'olive', label = 'Degree Distribution')
+    plt.plot(X, [func(x, a, b) for x in X])
+    plt.xlabel('Degree')
+    plt.ylabel('Number of nodes')
+    plt.show()
+
+def get_diameter(Graph):
+    NTestNodes = 302
+    return snap.GetBfsFullDiam(Graph, NTestNodes, True)
 
 Graph = snap.LoadEdgeList(snap.PNGraph, "../data/celegans_n306.txt", 0, 1)
 
-draw_degree_distribution(Graph)
+#draw_degree_distribution(Graph)
+fit_deg_dist(Graph)
+
 
 #print get_clustering_coefficient(Graph)
 
 # print compute_HITS(Graph)
 # print compute_pagerank(Graph)
-
