@@ -24,6 +24,9 @@ def run_girvan_newman(Graph):
         print(tuple(sorted(c) for c in communities))
 
 
+
+
+
 G_elegans = nx.DiGraph()
 G_elegans.add_weighted_edges_from(read_graph_file("../data/celegans_n306.txt"))
 run_girvan_newman(G_elegans)

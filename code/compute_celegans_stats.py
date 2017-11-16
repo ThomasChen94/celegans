@@ -1,5 +1,7 @@
 import snap
 import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+import numpy as np
 
 def compute_HITS(Graph):
     '''
@@ -56,12 +58,30 @@ def draw_degree_distribution(Graph, logAxis = True):
     plt.xlabel('Degree(log)')
     plt.ylabel('Number of nodes(log)')
     plt.show()
+    return X, Y
 
+
+def fit_deg_dist(Graph):
+
+    def func(x, a, b):
+        return a * x * np.exp(-b * x)
+    X, Y = draw_degree_distribution(Graph)
+    X = np.array(X)
+    Y = np.array(Y)
+    popt, pcov = curve_fit(func, X, Y)
+    a, b = popt
+    plt.plot(X, Y, color = 'olive', label = 'Degree Distribution')
+    plt.plot(X, [func(x, a, b) for x in X])
+    plt.xlabel('Degree')
+    plt.ylabel('Number of nodes')
+    plt.show()
 
 
 Graph = snap.LoadEdgeList(snap.PNGraph, "../data/celegans_n306.txt", 0, 1)
 
-draw_degree_distribution(Graph)
+#draw_degree_distribution(Graph)
+fit_deg_dist(Graph)
+
 
 #print get_clustering_coefficient(Graph)
 
