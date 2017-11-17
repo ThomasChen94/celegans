@@ -1,7 +1,7 @@
 import networkx as nx
 import itertools
 from networkx.algorithms.community.centrality import girvan_newman
-
+from networkx.algorithms.efficiency import global_efficiency
 
 def read_graph_file(file_path):
     edge_list = []
@@ -11,7 +11,7 @@ def read_graph_file(file_path):
         new_edge = line.split()
         new_edge[0] = int(new_edge[0])
         new_edge[1] = int(new_edge[1])
-        new_edge[2] = int(new_edge[2])
+        # new_edge[2] = int(new_edge[2])
         edge_list.append(tuple(new_edge))
         line = f.readline()
     return edge_list
@@ -24,9 +24,11 @@ def run_girvan_newman(Graph):
         print(tuple(sorted(c) for c in communities))
 
 
+# G_elegans = nx.DiGraph()
+# G_elegans.add_weighted_edges_from(read_graph_file("../data/celegans_n306.txt"))
+# run_girvan_newman(G_elegans)
 
 
-
-G_elegans = nx.DiGraph()
-G_elegans.add_weighted_edges_from(read_graph_file("../data/celegans_n306.txt"))
-run_girvan_newman(G_elegans)
+G_elegans = nx.Graph()
+G_elegans.add_edges_from(read_graph_file("../data/Erdos-Renyi.txt"))
+print global_efficiency(G_elegans)
