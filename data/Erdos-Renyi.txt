@@ -1,3 +1,6 @@
+# Directed graph: ../data/Erdos-Renyi.txt 
+# Nodes: 300 Edges: 2400
+# FromNodeId	ToNodeId
 0	5
 0	7
 0	112
