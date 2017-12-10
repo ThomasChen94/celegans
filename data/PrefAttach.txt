@@ -1,3 +1,6 @@
+# Undirected graph (each unordered pair of nodes is saved once): ../data/PrefAttach.txt
+# Nodes: 300 Edges: 2364
+# NodeId	NodeId
 0	1
 0	2
 0	3

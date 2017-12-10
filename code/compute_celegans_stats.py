@@ -41,70 +41,91 @@ def compute_pagerank(Graph):
 def get_clustering_coefficient(Graph):
     return snap.GetClustCf (Graph, -1)
 
+
+def get_in_degree_distribution(Graph):
+    snap.GetInDegCnt(Graph, DegToCntV)
+    num_node = Graph.GetNodes()
+    XI, YI = [], []
+    for item in DegToCntV:
+        if item.GetVal1() == 0 or item.GetVal2() == 0:
+            continue
+        XI.append(item.GetVal1())
+        YI.append(item.GetVal2() * 1.0 / num_node)
+    return XI, YI
+
+def get_out_degree_distribution(Graph):
+    snap.GetOutDegCnt(Graph, DegToCntV)
+    num_node = Graph.GetNodes()
+    XO, YO = [], []
+    for item in DegToCntV:
+        if item.GetVal1() == 0 or item.GetVal2() == 0:
+            continue
+        XO.append(item.GetVal1())
+        YO.append(item.GetVal2() * 1.0 / num_node)
+    return XO, YO
+    
 def draw_degree_distribution(Graph, Graph1, Graph2, logAxis = True):
     DegToCntV = snap.TIntPrV()
 
-    snap.GetDegCnt(Graph, DegToCntV)
-    num_node = Graph.GetNodes()
-    X, Y = [], []
-    for item in DegToCntV:
-        if item.GetVal1() == 0 or item.GetVal2() == 0:
-            continue
-        X.append(item.GetVal1())
-        Y.append(item.GetVal2() * 1.0 / num_node)
+    XI, YI = get_in_degree_distribution(Graph)
+    XO, YO = get_out_degree_distribution(Graph)
+    X1, Y1 = get_out_degree_distribution(Graph1) # Both are undirected graphs, so can use either in-degree or out-degree
+    X2, Y2 = get_out_degree_distribution(Graph2)
 
-    snap.GetDegCnt(Graph1, DegToCntV)
-    num_node = Graph.GetNodes()
-    X1, Y1 = [], []
-    for item in DegToCntV:
-        if item.GetVal1() == 0 or item.GetVal2() == 0:
-            continue
-        X1.append(item.GetVal1())
-        Y1.append(item.GetVal2() * 1.0 / num_node)
-
-    snap.GetDegCnt(Graph2, DegToCntV)
-    num_node = Graph.GetNodes()
-    X2, Y2 = [], []
-    for item in DegToCntV:
-        if item.GetVal1() == 0 or item.GetVal2() == 0:
-            continue
-        X2.append(item.GetVal1())
-        Y2.append(item.GetVal2() * 1.0 / num_node)
-
-    l1, = plt.loglog(X, Y, '+', color = 'blue', label = 'Degree Distribution (log)')
-    l2, = plt.loglog(X1, Y1, '+', color = 'red', label = 'Degree Distribution (log)')
-    l3, = plt.loglog(X2, Y2, '+', color = 'green', label = 'Degree Distribution (log)')
-    plt.legend([l1, l2, l3], ['C. Elegans', 'Erdos-Renyi', 'Preferential Attachment'])
+    l0, = plt.loglog(XI, YI, '-', color = 'blue', label = 'Degree Distribution (log)')
+    l1, = plt.loglog(XO, YO, '-', color = 'green', label = 'Degree Distribution (log)')
+    l2, = plt.loglog(X1, Y1, '-', color = 'red', label = 'Degree Distribution (log)')
+    l3, = plt.loglog(X2, Y2, '-', color = 'orange', label = 'Degree Distribution (log)')
+    plt.legend([l0, l1, l2, l3], ['C. Elegans, in degree', 'C. Elegans, out degree', 'Erdos-Renyi', 'Preferential Attachment'])
     plt.xlabel('Degree (log)')
     plt.ylabel('Number of nodes (log)')
     plt.show()
-    return X, Y
 
 
 def fit_deg_dist(Graph):
 
     def func(x, a, b):
-        return a * x * np.exp(-b * x)
-    X, Y = draw_degree_distribution(Graph)
+        return a * np.exp(-b * x)
+    DegToCntV = snap.TIntPrV()
+
+    X, Y = get_in_degree_distribution(Graph)
+
+    plt.subplot(2, 1, 1)
     X = np.array(X)
     Y = np.array(Y)
     popt, pcov = curve_fit(func, X, Y)
     a, b = popt
-    plt.plot(X, Y, color = 'olive', label = 'Degree Distribution')
-    plt.plot(X, [func(x, a, b) for x in X])
+    l0, = plt.plot(X, Y, color = 'olive', label = 'Degree Distribution')
+    l1, = plt.plot(X, [func(x, a, b) for x in X])
+    plt.legend([l0, l1], ['C. Elegans, in degree', 'Fitted a*exp(-b*x) curve'])
     plt.xlabel('Degree')
     plt.ylabel('Number of nodes')
+    
+    X, Y = get_out_degree_distribution(Graph)
+
+    plt.subplot(2, 1, 2)
+    X = np.array(X)
+    Y = np.array(Y)
+    popt, pcov = curve_fit(func, X, Y)
+    a, b = popt
+    l0, = plt.plot(X, Y, color = 'olive', label = 'Degree Distribution')
+    l1, = plt.plot(X, [func(x, a, b) for x in X])
+    plt.legend([l0, l1], ['C. Elegans, out degree', 'Fitted a*exp(-b*x) curve'])
+    plt.xlabel('Degree')
+    plt.ylabel('Number of nodes')
+    
     plt.show()
+
 
 def get_diameter(Graph):
     NTestNodes = 302
     return snap.GetBfsFullDiam(Graph, NTestNodes, True)
 
 Graph = snap.LoadEdgeList(snap.PNGraph, "../data/celegans_n306.txt", 0, 1)
-Graph1 = snap.LoadEdgeList(snap.PNGraph, "../data/Erdos-Renyi.txt", 0, 1)
-Graph2 = snap.LoadEdgeList(snap.PNGraph, "../data/PrefAttach.txt", 0, 1)
 
-
+Graph1 = snap.LoadEdgeList(snap.PUNGraph, "../data/Erdos-Renyi.txt", 0, 1)
+Graph2 = snap.LoadEdgeList(snap.PUNGraph, "../data/PrefAttach.txt", 0, 1)
+# 
 
 draw_degree_distribution(Graph, Graph1, Graph2)
 # fit_deg_dist(Graph)
