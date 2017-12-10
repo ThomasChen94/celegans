@@ -103,7 +103,9 @@ def get_diameter(Graph):
 Graph = snap.LoadEdgeList(snap.PNGraph, "../data/celegans_n306.txt", 0, 1)
 Graph1 = snap.LoadEdgeList(snap.PNGraph, "../data/Erdos-Renyi.txt", 0, 1)
 Graph2 = snap.LoadEdgeList(snap.PNGraph, "../data/PrefAttach.txt", 0, 1)
-# 
+
+
+
 draw_degree_distribution(Graph, Graph1, Graph2)
 # fit_deg_dist(Graph)
 

@@ -11,6 +11,8 @@ def parseNetworkCsv(path):
     count = 0
     for edge in neuron_data:
         weight = edge[3]
+        if weight == 'Nbr':
+            continue
         if edge[2] == 'S' or edge[2] == 'Sp':
             # send
             src = edge[0]
@@ -64,8 +66,8 @@ def parseNetworkTxt(path):
 
 
 adj_list_neuron, mapNeuronToDeg, neuron_to_id = parseNetworkCsv('../data/NeuronConnect.csv')
-
-f = open('celegans_n285.txt', 'w')
+print len(neuron_to_id)
+f = open('../data/celegans_n283.txt', 'w')
 for neuron, neigh_list in adj_list_neuron.items():
     for neigh in neigh_list:
         edge = [str(neuron_to_id[neuron]), str(neuron_to_id[neigh[0]]), str(neigh[1])]
@@ -73,7 +75,7 @@ for neuron, neigh_list in adj_list_neuron.items():
 
 f.close()
 
-f = open('map_neuron_to_id.txt', 'w')
+f = open('../data/map_neuron_to_id.txt', 'w')
 f.write(json.dumps(neuron_to_id))
 f.close()
 
